@@ -266,3 +266,10 @@ pub fn sync(syncronize_on: List(SyncOption)) {
 pub fn select(css_selector: String) {
   attribute("hx-select", css_selector)
 }
+
+pub fn push_url(bool: Bool) {
+  case bool {
+    True -> attribute("hx-push-url", "true")
+    False -> attribute("hx-push-url", "false")
+  }
+}
