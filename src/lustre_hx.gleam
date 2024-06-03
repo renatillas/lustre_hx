@@ -273,3 +273,7 @@ pub fn push_url(bool: Bool) {
     False -> attribute("hx-push-url", "false")
   }
 }
+
+pub fn confirm(confirm_text: String) {
+  attribute("hx-confirm", confirm_text)
+}
