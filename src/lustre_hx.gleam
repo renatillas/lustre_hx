@@ -262,3 +262,7 @@ pub fn sync(syncronize_on: List(SyncOption)) {
     list.map(syncronize_on, sync_option_to_string) |> string.join(" "),
   )
 }
+
+pub fn select(css_selector: String) {
+  attribute("hx-select", css_selector)
+}
