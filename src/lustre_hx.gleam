@@ -222,9 +222,17 @@ pub fn target(extended_css_selector extended_css_selector: ExtendedCssSelector) 
   attribute("hx-target", extended_css_selector_to_string(extended_css_selector))
 }
 
-pub fn swap(swap swap: Swap, option option: SwapOption) {
-  swap
-  |> swap_to_string
-  |> string.append(swap_option_to_string(option))
-  |> attribute("hx-swap", _)
+pub fn swap(swap swap: Swap, option option: Option(SwapOption)) {
+  case option {
+    Some(option) -> {
+      swap
+      |> swap_to_string
+      |> string.append(swap_option_to_string(option))
+      |> attribute("hx-swap", _)
+    }
+    None ->
+      swap
+      |> swap_to_string
+      |> attribute("hx-swap", _)
+  }
 }
