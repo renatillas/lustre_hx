@@ -21,6 +21,14 @@ pub type Swap {
   SwapNone
 }
 
+pub type SyncOption {
+  Default(css_selector: String)
+  Drop(css_selector: String)
+  Abort(css_selector: String)
+  Replace(css_selector: String)
+  SyncQueue(css_selector: String, queue: Queue)
+}
+
 pub type Scroll {
   Top
   Bottom
@@ -51,7 +59,6 @@ pub type Queue {
   First
   Last
   All
-  QueueNone
 }
 
 pub type Event {
@@ -66,7 +73,19 @@ pub type EventModifier {
   From(extended_css_selector: ExtendedCssSelector)
   Target(css_selector: String)
   Consume
-  Queue(Queue)
+  QueueEvent(Option(Queue))
+}
+
+fn sync_option_to_string(sync_option: SyncOption) {
+  case sync_option {
+    Drop(selector) -> selector <> ":drop"
+    Abort(selector) -> selector <> ":abort"
+    Replace(selector) -> selector <> ":replace"
+    SyncQueue(selector, First) -> selector <> ":queue first"
+    SyncQueue(selector, All) -> selector <> ":queue all"
+    SyncQueue(selector, Last) -> selector <> ":queue last"
+    Default(selector) -> selector
+  }
 }
 
 fn swap_to_string(swap: Swap) {
@@ -117,12 +136,12 @@ fn extended_css_selector_to_string(
   }
 }
 
-fn queue_to_string(queue: Queue) -> String {
+fn queue_to_string(queue: Option(Queue)) -> String {
   case queue {
-    First -> "first"
-    Last -> "last"
-    All -> "all"
-    QueueNone -> "none"
+    Some(First) -> "first"
+    Some(Last) -> "last"
+    Some(All) -> "all"
+    None -> "none"
   }
 }
 
@@ -149,7 +168,7 @@ fn event_modifier_to_string(event_modifier event_modifier: EventModifier) {
       "from:" <> extended_css_selector_to_string(extended_css_selector)
     Target(css_selector) -> "target:" <> css_selector
     Consume -> "consume"
-    Queue(queue) -> "queue:" <> queue_to_string(queue)
+    QueueEvent(queue) -> "queue:" <> queue_to_string(queue)
   }
 }
 
@@ -235,4 +254,11 @@ pub fn swap(swap swap: Swap, option option: Option(SwapOption)) {
       |> swap_to_string
       |> attribute("hx-swap", _)
   }
+}
+
+pub fn sync(syncronize_on: List(SyncOption)) {
+  attribute(
+    "hx-sync",
+    list.map(syncronize_on, sync_option_to_string) |> string.join(" "),
+  )
 }
