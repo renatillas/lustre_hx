@@ -277,3 +277,10 @@ pub fn push_url(bool: Bool) {
 pub fn confirm(confirm_text: String) {
   attribute("hx-confirm", confirm_text)
 }
+
+pub fn boost(set: Bool) {
+  case set {
+    True -> attribute("hx-boost", "true")
+    False -> attribute("hx-boost", "false")
+  }
+}
