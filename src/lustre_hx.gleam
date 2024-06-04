@@ -284,3 +284,7 @@ pub fn boost(set: Bool) {
     False -> attribute("hx-boost", "false")
   }
 }
+
+pub fn hyper_script(script: String) {
+  attribute("_", script)
+}
