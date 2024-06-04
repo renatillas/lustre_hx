@@ -4,7 +4,7 @@ import gleam/option.{type Option, None, Some}
 import gleam/string
 import lustre/attribute.{attribute}
 
-pub type TimingDeclaration {
+pub type Timing {
   Seconds(Int)
   Milliseconds(Int)
 }
@@ -36,8 +36,8 @@ pub type Scroll {
 
 pub type SwapOption {
   Transition(Bool)
-  Swap(TimingDeclaration)
-  Settle(TimingDeclaration)
+  Swap(Timing)
+  Settle(Timing)
   IgnoreTitle(Bool)
   Scroll(Scroll)
   Show(Scroll)
@@ -45,7 +45,7 @@ pub type SwapOption {
 }
 
 pub type ExtendedCssSelector {
-  Standard(css_selector: String)
+  CssSelector(css_selector: String)
   Document
   Window
   Closest(css_selector: String)
@@ -61,6 +61,10 @@ pub type Queue {
   All
 }
 
+/// # Event
+/// Used by the `trigger` function. 
+///
+/// A trigger can also have additional modifiers that change its behavior, represented as a `List(EventModifier)`.
 pub type Event {
   Event(event: String, modifiers: List(EventModifier))
 }
@@ -68,8 +72,8 @@ pub type Event {
 pub type EventModifier {
   Once
   Changed
-  Delay(TimingDeclaration)
-  Throttle(TimingDeclaration)
+  Delay(Timing)
+  Throttle(Timing)
   From(extended_css_selector: ExtendedCssSelector)
   Target(css_selector: String)
   Consume
@@ -125,7 +129,7 @@ fn extended_css_selector_to_string(
   extended_css_selector: ExtendedCssSelector,
 ) -> String {
   case extended_css_selector {
-    Standard(css_selector) -> css_selector
+    CssSelector(css_selector) -> css_selector
     Document -> "document"
     Window -> "window"
     Closest(css_selector) -> "closest " <> css_selector
@@ -145,7 +149,7 @@ fn queue_to_string(queue: Option(Queue)) -> String {
   }
 }
 
-fn timing_declaration_to_string(timing: TimingDeclaration) {
+fn timing_declaration_to_string(timing: Timing) {
   case timing {
     Seconds(n) -> int.to_string(n) <> "s"
     Milliseconds(n) -> int.to_string(n) <> "ms"
@@ -172,26 +176,77 @@ fn event_modifier_to_string(event_modifier event_modifier: EventModifier) {
   }
 }
 
+/// # hx-get
+/// Issues a GET request to the given URL when the element is triggered.
+/// By default, AJAX requests are triggered by the “natural” event of an element:
+///
+/// * input, textarea & select are triggered on the change event
+/// * form is triggered on the submit event
+/// * everything else is triggered by the click event
+///
+/// If you want different behavior you can use the hx-trigger attribute, provided by lustre_hx.trigger, to specify which event will cause the request.
 pub fn get(url url: String) {
   attribute("hx-get", url)
 }
 
+/// # hx-post
+/// Issues a POST request to the given URL when the element is triggered. By default, AJAX requests are triggered by the “natural” event of an element:
+///
+/// * input, textarea & select are triggered on the change event
+/// * form is triggered on the submit event
+/// * everything else is triggered by the click event
+///
+/// If you want different behavior you can use the hx-trigger attribute, provided by lustre_hx.trigger, to specify which event will cause the request.
 pub fn post(url url: String) {
   attribute("hx-post", url)
+  get
 }
 
+/// # hx-put
+/// Issues a PUT request to the given URL when the element is triggered. By default, AJAX requests are triggered by the “natural” event of an element:
+///
+/// * input, textarea & select are triggered on the change event
+/// * form is triggered on the submit event
+/// * everything else is triggered by the click event
+///
+/// If you want different behavior you can use the hx-trigger attribute, provided by lustre_hx.trigger, to specify which event will cause the request.
 pub fn put(url url: String) {
   attribute("hx-put", url)
 }
 
+/// # hx-patch
+/// Issues a PATCH request to the given URL when the element is triggered. By default, AJAX requests are triggered by the “natural” event of an element:
+///
+/// * input, textarea & select are triggered on the change event
+/// * form is triggered on the submit event
+/// * everything else is triggered by the click event
+///
+/// If you want different behavior you can use the hx-trigger attribute, provided by lustre_hx.trigger, to specify which event will cause the request.
 pub fn patch(url url: String) {
   attribute("hx-patch", url)
 }
 
+/// # hx-delete
+/// Issues a DELETE request to the given URL when the element is triggered. By default, AJAX requests are triggered by the “natural” event of an element:
+///
+/// * input, textarea & select are triggered on the change event
+/// * form is triggered on the submit event
+/// * everything else is triggered by the click event
+///
+/// If you want different behavior you can use the hx-trigger attribute, provided by lustre_hx.trigger, to specify which event will cause the request.
 pub fn delete(url url: String) {
   attribute("hx-delete", url)
 }
 
+//
+/// # hx-trigger
+/// By default, AJAX requests are triggered by the “natural” event of an element:
+///
+/// * input, textarea & select are triggered on the change event
+/// * form is triggered on the submit event
+/// * everything else is triggered by the click event
+///
+/// If you want different behavior you can use the hx-trigger attribute to specify which event will cause the request.
 pub fn trigger(events: List(Event)) {
   let events =
     events
@@ -201,7 +256,7 @@ pub fn trigger(events: List(Event)) {
 }
 
 pub fn trigger_polling(
-  timing_declaration timing: TimingDeclaration,
+  timing_declaration timing: Timing,
   filters filters: Option(String),
 ) {
   case filters {
@@ -220,7 +275,7 @@ pub fn trigger_polling(
 }
 
 pub fn trigger_load_polling(
-  timing_declaration timing: TimingDeclaration,
+  timing_declaration timing: Timing,
   filters filters: String,
 ) {
   attribute(
