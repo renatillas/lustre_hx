@@ -199,7 +199,6 @@ pub fn get(url url: String) {
 /// If you want different behavior you can use the hx-trigger attribute, provided by lustre_hx.trigger, to specify which event will cause the request.
 pub fn post(url url: String) {
   attribute("hx-post", url)
-  get
 }
 
 /// # hx-put
